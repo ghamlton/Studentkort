@@ -1,7 +1,7 @@
 "use strict";
 /*
  * Laboration 5 - Studentkortsgenerator
- * Namn: DITT NAMN
+ * Namn: Gabriel Hamilton
  */
 
 // Hämta element från DOM
@@ -34,6 +34,8 @@ let history = [];
  */
 function validateForm() {
     // Kontrollera formulärets obligatoriska fält
+
+
 
     // Visa eventuella felmeddelanden
 
@@ -98,7 +100,9 @@ function renderHistory() {
  */
 function clearForm() {
     // Återställ formulär och studentkort
-
+    fullnameInput.value = "";
+    emailInput.value = "";
+    phoneInput.value = "";
     // Rensa eventuella felmeddelanden
 }
 
@@ -121,6 +125,7 @@ function deleteHistory() {
 
 
 // När användaren klickar på "Rensa"
+clearButton.addEventListener('click', clearForm);
 
 
 // När användaren klickar på "Radera historik"
