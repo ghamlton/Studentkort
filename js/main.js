@@ -35,22 +35,29 @@ let history = [];
 function validateForm() {
     // Kontrollera formulärets obligatoriska fält
 
-    if (fullnameInput.value == ""){
+    //Rensa felmeddelanden från array och ul-list
+    errors = [];
+    errorList.innerHTML = "";
+
+    if (fullnameInput.value === ""){
         errors.push("Skriv förnamn och efternamn");
     }
-    if (emailInput.value == ""){
+    if (emailInput.value === ""){
         errors.push("Skriv in din mejladress")
     }
-    if (phoneInput.value == ""){
-        errors.push("Skriv ditt telefonnummer");
+    if (phoneInput.value === ""){
+        errors.push("Skriv in ditt telefonnummer");
     }
     
     // Visa eventuella felmeddelanden
 
-    displayErrors();
-
     // Returnera resultatet (true eller false) av valideringen
-    
+    if(errors.length > 0){
+        displayErrors();
+    }
+    else{
+        return true;
+    }
 }
 
 
@@ -75,7 +82,15 @@ function displayErrors() {
 function createStudentCard() {
     // Hämta information från formuläret
 
+    let name = fullnameInput.value;
+    let email = emailInput.value;
+    let phone = phoneInput.value;
+
     // Uppdatera studentkortet
+
+    previewFullname.textContent = name;
+    previewEmail.textContent = email;
+    previewPhone.textContent = phone;
 
     // Lägg till studentkortet i historiken
 
@@ -116,9 +131,9 @@ function renderHistory() {
  */
 function clearForm() {
     // Återställ formulär och studentkort
-    fullnameInput.value = "";
-    emailInput.value = "";
-    phoneInput.value = "";
+    errors = [];
+    errorList.innerHTML = "";
+    form.reset();
     // Rensa eventuella felmeddelanden
 }
 
@@ -137,11 +152,16 @@ function deleteHistory() {
 
 // När formuläret skickas:
 // - validera inmatningen
-form.addEventListener("submit", validateForm);
+form.addEventListener("submit", function(event){
+    event.preventDefault();
+    validateForm();
+
+    if(validateForm(true)){
+        createStudentCard();
+    }
+
+});
 // - skapa studentkort om valideringen lyckas
-if (validateForm == true){
-    createStudentCard();
-}
 
 // När användaren klickar på "Rensa"
 clearButton.addEventListener('click', clearForm);
