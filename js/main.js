@@ -85,6 +85,7 @@ function createStudentCard() {
     let name = fullnameInput.value;
     let email = emailInput.value;
     let phone = phoneInput.value;
+    let font = fontSelect.value;
 
     // Uppdatera studentkortet
 
@@ -92,9 +93,27 @@ function createStudentCard() {
     previewEmail.textContent = email;
     previewPhone.textContent = phone;
 
+    previewFullname.style.fontFamily = font;
+    previewEmail.style.fontFamily = font;
+    previewPhone.style.fontFamily = font;
+
     // Lägg till studentkortet i historiken
+    let studentCard = {
+        fullName: fullnameInput.value,
+        eMail: emailInput.value,
+        phoneNum: phoneInput.value,
+        fontFam: fontSelect.value
+    };
+
+    history.push(studentCard);
 
     // Spara och uppdatera historiken
+    localStorage.setItem("historik", JSON.stringify(history));
+    
+
+    
+
+
 }
 
 
@@ -156,10 +175,10 @@ form.addEventListener("submit", function(event){
     event.preventDefault();
     validateForm();
 
+    //Om valideringen inte finner några fel exekveras funktionen som skapar studentkort
     if(validateForm(true)){
         createStudentCard();
     }
-
 });
 // - skapa studentkort om valideringen lyckas
 
