@@ -93,6 +93,8 @@ function createStudentCard() {
     previewEmail.textContent = email;
     previewPhone.textContent = phone;
 
+    //Ändrar fonten av all inmatad data beroende på font-val i formuläret
+
     previewFullname.style.fontFamily = font;
     previewEmail.style.fontFamily = font;
     previewPhone.style.fontFamily = font;
@@ -108,12 +110,9 @@ function createStudentCard() {
     history.push(studentCard);
 
     // Spara och uppdatera historiken
-    localStorage.setItem("historik", JSON.stringify(history));
-    
-
-    
-
-
+    //Använder färdiga funktioner så koden blir renare och snyggare
+    saveHistory();
+    loadHistory();
 }
 
 
@@ -122,6 +121,7 @@ function createStudentCard() {
  */
 function saveHistory() {
     // Spara history i localStorage
+    localStorage.setItem("historik", JSON.stringify(history));
 }
 
 
@@ -130,18 +130,50 @@ function saveHistory() {
  */
 function loadHistory() {
     // Hämta eventuell sparad historik
-
+    let historik = JSON.parse(localStorage.getItem("historik"));
+    history = historik;
     // Uppdatera history
+    renderHistory(history);
 }
 
 
 /**
  * Visar historiken på sidan.
  */
-function renderHistory() {
+function renderHistory(history) {
     // Rensa tidigare visad historik
-
+    historySection.innerHTML = "";
     // Skriv ut innehållet i history till DOM
+    for(let studentCard of history){
+
+        //Skapar element som utgör ett studentkort i historiken på sidan
+        let article = document.createElement("article");
+        let name = document.createElement("p");
+        let email = document.createElement("p");
+        let phone = document.createElement("p");
+        let font = document.createElement("p");
+
+        //Style för själva article-elementet
+        article.style.backgroundColor = "lightgray";
+        article.style.padding = "5px";
+        article.style.marginBottom = "10px";
+        article.style.boxShadow = "5px 5px 20px";
+
+        //Värdena av properties från objekt studentCard läggs in som textContent in i <p> element som skapats ovan
+        name.textContent = studentCard.fullName;
+        email.textContent = studentCard.eMail;
+        phone.textContent = studentCard.phoneNum;
+        font.textContent = studentCard.fontFam;
+
+        //Lägger till alla <p> element i <article>
+        article.appendChild(name);
+        article.appendChild(email);
+        article.appendChild(phone);
+        article.appendChild(font);
+
+        //Till slut läggs själva <article> in i #history div
+        historySection.appendChild(article);
+    }
 }
 
 
@@ -162,8 +194,10 @@ function clearForm() {
  */
 function deleteHistory() {
     // Radera sparad historik
-
+    localStorage.clear();
     // Uppdatera history och visningen på sidan
+    history = [];
+    historySection.innerHTML = "";
 }
 
 
@@ -187,6 +221,7 @@ clearButton.addEventListener('click', clearForm);
 
 
 // När användaren klickar på "Radera historik"
+deleteHistoryButton.addEventListener("click", deleteHistory);
 
 
 // När sidan laddas:
