@@ -33,37 +33,34 @@ let history = [];
  * @returns {boolean}
  */
 function validateForm() {
-    // Kontrollera formulärets obligatoriska fält
 
     //Rensa felmeddelanden från array och ul-list
     errors = [];
     errorList.innerHTML = "";
 
-    if (fullnameInput.value === ""){
+    //Kollar om input-fälten innehåller någonting, och baserat på resultat skriver ut felmeddelande eller ej
+    if (fullnameInput.value.trim() === ""){
         errors.push("Skriv förnamn och efternamn");
     }
-    if (emailInput.value === ""){
+    if (emailInput.value.trim() === ""){
         errors.push("Skriv in din mejladress")
     }
-    if (phoneInput.value === ""){
+    if (phoneInput.value.trim() === ""){
         errors.push("Skriv in ditt telefonnummer");
     }
-    
-    // Visa eventuella felmeddelanden
 
-    // Returnera resultatet (true eller false) av valideringen
+    //Kollar om errors[] innehåller någonting (felmeddelanden)
+    //Om errors[] innehåller någonting så kör den displayErrors() nedanför
+    //Annars returnerar den bara true
     if(errors.length > 0){
         displayErrors();
     }
     else{
-        return true;
+        return true; // Vid return true så kommer createStudentCard() att köras (se eventListener längst ner)
     }
 }
 
-
-/**
- * Visar felmeddelanden på sidan.
- */
+//Visar felmeddelanden på sidan i form av en ul-list
 function displayErrors() {
     // Rensa tidigare felmeddelanden
     errorList.innerHTML = "";
@@ -75,71 +72,63 @@ function displayErrors() {
     }
 }
 
-
-/**
- * Skapar ett studentkort och visar det på sidan.
- */
+//Skapar studentkort som lagras i localStorage, array och visas i historiken på hemsidan
 function createStudentCard() {
-    // Hämta information från formuläret
 
+    //Hämtar information från formuläret och lägger in det i variabler. De används sedan för att skapa ett objekt som läggs in i history[]
     let name = fullnameInput.value;
     let email = emailInput.value;
     let phone = phoneInput.value;
     let font = fontSelect.value;
 
-    // Uppdatera studentkortet
+    //Uppdaterar själva "preview"-kortet på hemsidan ovanför formuläret
 
-    previewFullname.textContent = name;
-    previewEmail.textContent = email;
-    previewPhone.textContent = phone;
+    previewFullname.textContent = fullnameInput.value;
+    previewEmail.textContent = emailInput.value;
+    previewPhone.textContent = phoneInput.value;
 
     //Ändrar fonten av all inmatad data beroende på font-val i formuläret
+    //Detta ser man i "preview" ovanför formuläret
 
-    previewFullname.style.fontFamily = font;
-    previewEmail.style.fontFamily = font;
-    previewPhone.style.fontFamily = font;
+    previewFullname.style.fontFamily = fontSelect.value;
+    previewEmail.style.fontFamily = fontSelect.value;
+    previewPhone.style.fontFamily = fontSelect.value;
 
-    // Lägg till studentkortet i historiken
+    //Skapar objekt studentCard som innehåller all information för skapande av studentkort på hemsidan
     let studentCard = {
-        fullName: fullnameInput.value,
-        eMail: emailInput.value,
-        phoneNum: phoneInput.value,
-        fontFam: fontSelect.value
+        fullName: name,
+        eMail: email,
+        phoneNum: phone,
+        fontFam: font
     };
 
+    //Lägger till ett objekt studentCard i history[] i slutet av arrayen
     history.push(studentCard);
 
-    // Spara och uppdatera historiken
     //Använder färdiga funktioner så koden blir renare och snyggare
     saveHistory();
     loadHistory();
 }
 
-
-/**
- * Sparar historiken i localStorage.
- */
+//Sparar historiken i localStorage
 function saveHistory() {
-    // Spara history i localStorage
+    //Enkelt sparande i localStorage med nyckel "historik" för att hämta arrayen vid senare tillfällen
     localStorage.setItem("historik", JSON.stringify(history));
 }
 
-
-/**
- * Läser in tidigare historik från localStorage.
- */
+//Hämtar enbart historik om det finns sparat i localStorage.
 function loadHistory() {
-    // Hämta eventuell sparad historik
-    let historik = JSON.parse(localStorage.getItem("historik"));
-    history = historik;
-    // Uppdatera history
-    renderHistory(history);
+    //Försökte att hämta från localStorage utan en if-sats men det gav error, så detta blev lösningen.
+    if(localStorage.getItem("historik") !== null){
+        let historik = JSON.parse(localStorage.getItem("historik"));
+        history = historik;
+        renderHistory(history);
+    }
 }
 
 
-/**
- * Visar historiken på sidan.
- */
+
+//Visar historiken på sidan
 function renderHistory(history) {
     // Rensa tidigare visad historik
     historySection.innerHTML = "";
@@ -160,10 +149,10 @@ function renderHistory(history) {
         article.style.boxShadow = "5px 5px 20px";
 
         //Värdena av properties från objekt studentCard läggs in som textContent in i <p> element som skapats ovan
-        name.textContent = studentCard.fullName;
-        email.textContent = studentCard.eMail;
-        phone.textContent = studentCard.phoneNum;
-        font.textContent = studentCard.fontFam;
+        name.textContent = "Namn: " + studentCard.fullName;
+        email.textContent = "E-post: " + studentCard.eMail;
+        phone.textContent = "Telefon: " + studentCard.phoneNum;
+        font.textContent = "Font: " + studentCard.fontFam;
 
         //Lägger till alla <p> element i <article>
         article.appendChild(name);
@@ -172,7 +161,10 @@ function renderHistory(history) {
         article.appendChild(font);
 
         //Till slut läggs själva <article> in i #history div
+        //Lägger till style/css så att den nyaste kortet visas överst med flexbox
         historySection.appendChild(article);
+        historySection.style.display = "flex";
+        historySection.style.flexDirection = "column-reverse";
     }
 }
 
@@ -182,20 +174,31 @@ function renderHistory(history) {
  */
 function clearForm() {
     // Återställ formulär och studentkort
+
+    //Återställer "preview"-kortet med ursprunglig text
+    previewFullname.textContent = "Namn";
+    previewEmail.textContent = "E-post";
+    previewPhone.textContent = "Telefon";
+
+    //Använder också den ursprungliga fonten på texten
+    previewFullname.style.fontFamily = "Helvetica";
+    previewEmail.style.fontFamily = "Helvetica";
+    previewPhone.style.fontFamily = "Helvetica";
+
+    //Återställer formuläret genom att rensa input-fälten och <select>-knappen för font
+    form.reset();
+
+    //Arrayen blir tom och tar bort felmeddelanden från hemsidan
     errors = [];
     errorList.innerHTML = "";
-    form.reset();
-    // Rensa eventuella felmeddelanden
 }
 
 
-/**
- * Raderar hela historiken.
- */
+//Historik tas bort
 function deleteHistory() {
-    // Radera sparad historik
+    // Raderar sparad historik i localStorage
     localStorage.clear();
-    // Uppdatera history och visningen på sidan
+    //Arrayen för historik blir tom och all historik på hemsidan rensas
     history = [];
     historySection.innerHTML = "";
 }
@@ -209,20 +212,21 @@ form.addEventListener("submit", function(event){
     event.preventDefault();
     validateForm();
 
-    //Om valideringen inte finner några fel exekveras funktionen som skapar studentkort
+    //Om valideringen inte finner några fel (return true) exekveras funktionen som skapar studentkort createStudentCard()
     if(validateForm(true)){
         createStudentCard();
     }
 });
-// - skapa studentkort om valideringen lyckas
 
-// När användaren klickar på "Rensa"
+// När användaren klickar på "Rensa"-knappen
 clearButton.addEventListener('click', clearForm);
 
 
 // När användaren klickar på "Radera historik"
 deleteHistoryButton.addEventListener("click", deleteHistory);
 
-
-// När sidan laddas:
-// - läs in och visa eventuell tidigare historik
+//När sidan laddas körs funktionen loadHistory() som visar historik på hemsidan som är sparad i localStorage
+//Detta innebär att man kan ladda om/stänga och öppna hemsidan utan att förlora historik om man skapade studentkort tidigare
+window.addEventListener("load", function(){
+    loadHistory();
+});
